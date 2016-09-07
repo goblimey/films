@@ -1,0 +1,38 @@
+{{ define "PageTitle" }}Edit Person {{.Person.Forename}} {{.Person.Surname}} {{ end }}
+{{ define "content" }}
+    <form id='updateForm' action='/people/{{.Person.ID}}' method='post'>
+    	<input name='_method' value='PUT' type='hidden'/>
+    	<table>
+	    	<tr>
+	    		<td id='ForenameLabel'>Forename:</td>
+	    		<td><input id='ForenameValue' type="text" name='forename' value='{{.Person.Forename}}'/>
+	    		{{if .ErrorForField "Forename"}}
+	    			<td><span id='ForenameError'><font color='red'>{{.ErrorForField "Forename"}}</font></span></td>
+	    		{{else}}
+	    			<td>&nbsp;</td>
+	    		{{end}}
+	    	</tr>
+	    	<tr>
+	    		<td id='SurnameLabel'>Surname:</td>
+	    		<td><input id='SurnameValue' type="text" name='surname' value='{{.Person.Surname}}'/>
+	    		{{if .ErrorForField "Surname"}}
+	    			<td><span id='SurnameError'><font color='red'>{{.ErrorForField "Surname"}}</font></span></td>
+	    		{{else}}
+	    			<td>&nbsp;</td>
+	    		{{end}}
+	    	</tr>
+	    </table>
+	    <input id='UpdateButton' type='submit' value='Update'/>
+	</form>
+	<p>
+		<form id='deleteForm' action='/people/{{.Person.ID}}/delete' method='post'>
+			<input id='MethodParam' name='_method' value='DELETE' type='hidden'/>
+			<input id='deleteButton' type='submit' value='Delete'/>
+		</form>
+    </p>
+	<p>
+		<a id='ShowLink' href='/people/{{.Person.ID}}'>Show</a>
+		<a id='ViewLink' href='/people'>View All People</a>
+		<a id='CreateLink' href='/people/create'>Create Person</a>
+	</p>
+{{ end }}

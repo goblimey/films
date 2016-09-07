@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{ template "PageTitle" . }}</title>
+        <link href='/stylesheets/scaffold.css' rel='stylesheet'/>
+    </head>
+    <body>
+    	 <h2>Films</h2>
+    	 <h3>{{ template "PageTitle" . }}</h3>
+    		<p><font color='red'><b>{{.ErrorMessage}}</b></font></p>
+			<p><font color='green'><b>{{.Notice}}</b></font></p>
+        <section id="contents">
+            {{ template "content" . }}
+        </section>
+    </body>
+</html>
+

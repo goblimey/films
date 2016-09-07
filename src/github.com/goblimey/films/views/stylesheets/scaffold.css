@@ -1,0 +1,11 @@
+div.notice {
+  color: green;
+  font-weight: bold;
+}
+
+
+div.ErrorMessage {
+  color: red;
+  font-weight: bold;
+}
+

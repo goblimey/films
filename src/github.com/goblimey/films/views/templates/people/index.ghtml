@@ -1,0 +1,24 @@
+{{define "PageTitle"}}People{{end}}
+{{define "content" }}
+    <table>
+    {{ range .People }}
+        <tr>
+        	<td>
+	            <a id='LinkToShow{{.Forename}}{{.Surname}}'  href='/people/{{.ID}}'>{{.Forename}} {{.Surname}}</a>
+            </td>
+            <td>
+	            <a id='LinkToEdit{{.Forename}}{{.Surname}}' href='/people/{{.ID}}/edit'>Edit</a>
+            </td>
+            <td>
+		        <form action='/people/{{.ID}}/delete' method='post'>
+			        <input name='_method' value='DELETE' type='hidden'/>
+			        <input id='DeleteButton{{.Forename}}{{.Surname}}' type='submit' value='Delete'/>
+		        </form>
+            </td>  
+        </tr>	
+    {{ end }}
+    </table>
+    <p>
+		<a id='CreateLink' href='/people/create'>Create Person</a>
+	</p>
+{{ end }}

@@ -1,0 +1,22 @@
+{{ define "PageTitle" }}Person {{.Person.Forename}} {{.Person.Surname}} {{ end }}
+{{ define "content" }}
+    <p>
+    	<b>id:</b> <span id='id'>{{.Person.Id}}</span>
+	</p>
+    <p>
+    	<b>forename:</b> <span id='forename'>{{.Person.Forename}}</span>
+	</p>
+    <p>
+    	<b>surname:</b> <span surname='surname'>{{.Person.Surname}}</span>
+	</p>
+	<div id='DeleteButton' style='display: inline;'>
+		<form id='DeleteForm' action='/people/{{.Person.Id}}/delete' method='post' style='display: inline;'>
+			<input id='MethodParam' name='_method' value='DELETE' type='hidden'/>
+			<input id='DeleteButton' type='submit' value='Delete'/>
+		</form>
+	</div>	
+	<p>
+		<a id='EditLink' href='/people/{{.Person.Id}}/edit'>Edit</a>
+		<a id='ViewLink' href='/people'>View All People</a>
+	</p>
+{{ end }}

@@ -1,0 +1,30 @@
+{{ define "PageTitle" }}Create a Person {{ end }}
+{{ define "content" }}
+    <form action='/people' method='post'>
+    	<input id='methodParam' name='_method' value='PUT' type='hidden'/>
+    	<table>
+	    	<tr>
+	    		<td>Forename:</td>
+	    		<td><input id='forename' type='text' name='forename' value='{{.Person.Forename}}'/></td>
+	    		{{if .FieldErrors.Forename}}
+	    			<td><span id='ForenameError'><font color='red'>{{.FieldErrors.Forename}}</font></span></td>
+	    		{{else}}
+	    			<td>&nbsp;</td>
+	    		{{end}}
+	    	</tr>
+	    	<tr>
+	    		<td>Surname:</td>
+	    		<td><input id='surname' type='text' name='surname' value='{{.Person.Surname}}'/></td>
+	    		{{if .FieldErrors.Surname}}
+	    			<td><span id='SurnameError'><font color='red'>{{.FieldErrors.Surname}}</font></span></td>
+	    		{{else}}
+	    			<td>&nbsp;</td>
+	    		{{end}}
+	    	</tr>
+	    </table>
+	    <input id='CreateButton' type='submit' value='Create'/>
+	</form>
+	<p>
+		<a id='viewLink' href='/people'>View All People</a>
+	</p>
+{{ end }}
