@@ -204,7 +204,7 @@ This server is called films because a future version will display information ab
 
 In Go, an object satisfies an interfaces if it implements all of the methods of the interface, so you can create an interface and then create an object that satisfies it, or you can take an existing object and write an interface that it satisfies.  Unlike with languages such as Java, this means that an interface can be retrofitted to an object that you did not create.  For example, the net/html package defines a structure called a Template which is used to render an HTML page.  The films server includes an interface Template that the HTML template structure satisfies.  The controller uses the templates in terms of that interface, so its templates can be replaced with mock versions during testing.
 
-I've made extensive use of factory functions to create objects.  For example, I have an interface Person and a structure ConcretePerson that satifies it.  ConcretePerson has this function:
+I've made extensive use of factory functions to create objects.  For example, I have an interface Person and a structure ConcretePerson that satisfies it.  ConcretePerson has this function:
 
 ```go
 // MakePerson creates and returns a new uninitialised Person object
