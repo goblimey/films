@@ -1,11 +1,12 @@
 # films
 A simple MVC web server written in Go with restful interfaces providing CRUD operations on database tables.
 
-The films web server is a very simple example of how the Go programming language can be used to build a website.  It has one table called "people" with three fields, a numeric ID, a text field "forename" and another "surname".  The server has web pages that perform the Create, Read, Update and Delete (CRUD) operations on the table.  It looks (and is) ridiculously simple, but this allows me to concentrate on the mechanics of handling web pages and data rather than the business logic that a real website would require.  If you are trying to figure out how to create a website or just do test-driven development in Go, this software is intended to give you a good start.
+The films web server is a very simple example of how the Go programming language can be used to build a website.  It has one table called "people" with three fields, a numeric ID, a text field "forename" and another "surname".  The server has web pages that perform the Create, Read, Update and Delete (CRUD) operations on the table.  It looks (and is) ridiculously simple, but this allows me to concentrate on the mechanics of handling web pages and data rather than the business logic that a real website would require.  If you are trying to figure out how to create a website or just do test-driven development in Go, looking at this project should give you a start.
 
-I'm one of the organisers of the the Surrey Go User Group.  (https://groups.google.com/forum/#!forum/surrey-golang)  This software is the result of a piece of work that I'm doing with that group.  
+The server is designed using the Model View Controller (MVC) pattern, which supports separation of concerns.  The major components of the web server are models, views and controllers.  Each of those components is only concerned with well-defined issues.  The models are repositories (sometimes called Data Access Objects or DAOs) that provide access to data in the database.  The models are not concerned with what will be done with the data or how it will be represented (rendered) when the user sees it.  The views are templates that produce HTML pages.  They are only concerned with rendering the data.  They make no decisions, they just render the data that they are given.  The controllers implement the business logic of the application.  They use the repositories to access the data and use the views to display it.  They are not concerned with where the data comes from or how it will be rendered.  They are only concerned with what the user is allowed to do with the data.  
 
-The server is designed using the Model View Controller (MVC) pattern, which supports separation of concerns.  The major components of the web server are models, views and controllers.  Each of those components is only concerned about well-defined issues.  The models represent the data in the database, along with a bit of software called a repository which gives access to it.  The model is not concerned with what will be done with the data or how it will be represented (rendered) when the user sees it.  The views are templates that produce HTML pages.  They are only concerned with rendering the data.  They make no decisions, they just render what they are given.  The controllers access data in the databases and use the views to display it.  The controllers are not concerned with where the data comes from or how it will be rendered.  They are only concerned with what the user is allowed to do with the data.  They implement the business logic of the application.
+I'm one of the organisers of the the Surrey Go User Group (https://groups.google.com/forum/#!forum/surrey-golang).  Having looked at this project, other members of the group are now writing their own web servers, borrowing ideas from this one as needed. 
+
 
 Fetching and Building the Films Server
 ======================================
@@ -43,7 +44,7 @@ cd films
 go install github.com/goblimey/films
 ```
 
-The only part of that which is specific to UNIX or Linux is running setenv.sh.  That adds the current directory to the GOPATH, and the bin directory to the PATH.  
+The only part of that which is specific to UNIX or Linux is running setenv.sh.  That adds the current directory to the GOPATH, and the bin directory to the PATH. (The "." at the start of that line is a command and is required.)
 
 If you are running under Windows you can do the same by hand, something like this:
 
@@ -52,10 +53,11 @@ SET GOPATH=%GOPATH%;c:\Users\simon\goprojects\films
 SET PATH=%PATH%;c:\Users\simon\goprojects\films\bin
 ```
 
+
 Setting Up the Database
 -----------------------
 
-The server expects a MySQL database, so you need to install the MySQL client and server, which you can get from the Oracle website www.oracle.com.
+The server expects a MySQL database, so you need to install the MySQL client and server, which you can get from the Oracle website www.oracle.com.  You will need to create an account to download MySQL, but it is free.
 
 Once you have MySQL running, create a database called "films". This must be accessible with all privileges by a user called "webuser" with password "secret".  You can set that up as follows using the mysql client:
 
@@ -73,7 +75,7 @@ Those login details (webuser/secret) are defined in the method MakeGorpMysqlDBSe
 
 Note that things like table and database names are case-sensitive when MySQL runs under UNIX, so the databases "FILMS", "Films" and "films" are different objects.  Under Windows those names would all apply to the same object.  (This is because the objects are represented by files and follow the naming rules for files on those systems.)
 
-The server expects a table called "people".  if it doesn't exist, you can create an empty one.  If you prefer to set one up, here is a suitable description:
+The server expects a table called "people".  if it doesn't exist, the server will create an empty one when you start it up.  If you prefer to set one up yourself, here is a suitable description:
 
 ```
 mysql> use films;
@@ -88,22 +90,21 @@ mysql> describe people;
 3 rows in set (0.00 sec)
 ```
 
+
 Running the Server
 ------------------
 
-Start the server from a command window as follows:
-
-If you haven't already, in the top-level directory, run setenv.sh like so:
+Start the server from a command window.  If you have logged out and back in again since building the server, or if you are doing this part in a new command window, move to the same directory as before ($HOME/goprojects/films in my example) and set up your GOPATH and PATH variables.  Under UNIX and Linux, that's:
 
 ```
     .  setenv.sh
 ```
 
-(The "." at the start is a command and must be present.)
+The "go install" that you ran earlier created a program called "films" in the bin directory at the top level of the project.  The commands in setenv.sh put the program into your path, so you can run it.
 
-That puts the program "films" into your path.
+For Windows see above.
 
-Change to the directory containing the views directory:
+Move to the directory containing the views directory:
 
 ```
     cd src/github.com/goblimey/films
@@ -123,6 +124,8 @@ Initially there will be no entries in the people table.  Use the create button t
 
 The create screen has some simple validation to ensure that you fill in both fields.  Try missing one or both of them out and pressing the submit button.
 
+To stop the web server, go to the command window from which it is being run, hold down the ctrl key and type a single "c".  The result is instant, you don't need to hit the enter key.
+
 
 How the Server Works
 ====================
@@ -135,7 +138,7 @@ Struts has a useful gadget called a form bean, which is a data transfer object u
 
 Spring implements Inversion of Control to support interfaces and testing using mocking.  Each method in a Java Spring controller takes a standard set of arguments and is separated from the details of request handling.  The arguments are specified in terms of interfaces.  Something outside the controller creates the objects, so the controller doesn't know what type they are, it just knows that they satisfy the interfaces.
 
-The films server follows a simple version of those ideas.  Each method in a controller implements a request.  All incoming requests are fielded by the main.marshall method.  This figures out which controller to use and which method to call to handle the request.  The controller methods take a standard set of arguments defined using interfaces rather than real structures.  The database repositories that supply data to the model also supply it as interfaces.  This allows objects that conform to the same interface to be used interchangeably.  In particular mocks and dummies can be used during testing.  
+The films server follows a simple version of those ideas.  Each method in a controller implements a request.  All incoming requests are fielded by the main.marshall method.  This figures out which controller to use and which method to call to handle the request.  The controller methods take a standard set of arguments defined using interfaces rather than real structures.  The database repositories that supply data to the model also supply it as interfaces.  This allows objects that conform to the same interface to be used interchangeably.  In particular mocks and dummies can be used during testing.
 
 I've created objects modelled on the Struts form beans to carry the data to be rendered by the views.  Each form object can contain a notification message and/or an error message to be displayed at the top of the page, data items to be displayed and error messages about the data items.  When the user submits data in an HTML form, the main.marshall method presents it to the controller method in a form object.  When the server executes a template to display a web page, it supplies the data for the page in a form object.
 
@@ -173,15 +176,21 @@ type PersonForm interface {
 
 A structure that satisfies this interface contains a Person record with fields ID, surname and forename, a notice that should be displayed at the top of the page, an error message that should be displayed at the top of the page, and a list of field errors - error messages about individual fields of the Person record.  It provides Validate method which the server uses to check incoming data.
 
-In the films server, all requests are sent to a function called marshal.  This figures out which controller to call (currently there's only one, the people controller).  It creates a controller and objects containing the data that it needs.  It calls a method in the controller to handle the request, supplying the data as arguments.  The handler does some work and then displays an HTML page.
+In the films server, all requests are sent to a function in the main package called marshal.  This figures out which controller to call (currently there's only one, the people controller).  It creates a controller and a form object containing the data that the controller needs.  It calls a method in the controller to handle the request, supplying the data as an argument.  The handler does some work and then uses a template to render an HTML page displaying the result.
 
-For example, a user submits a request to create a Person.  The main.marshall creates a people controller and an empty person form and calls the controller's New method, passing the form.  New executes the Create template, passing the empty form as data.  The user sees a web form with empty fields and a submit button.
+A quick explanation for anybody who hasn't written a back-end web server before:  A web server loops forever, waiting for a request and then calling a controller method to handle it.  The controller method sends a response back to the browser which is an HTML page.  For the user's session to continue, every response page should contain buttons or links that allow them to issue another request.  The user's session is a series of requests and responses which lasts until the user gets bored and goes away.  The server runs until it's forcibly shut down.
+
+So the user and the server run through a session composed of a series of requests and responses.  Every response displays an HTML page and every page has links or buttons to issue another request and continue the session.  The pages allow the user to create, read, update and delete data in the table.  They have no direct access to the database or its tables, so they can only do with this table what the controller allows them to do and they can't access any other tables, if any exist.
+
+The workings of the server are best illustrated with an example.  A user starts at the index page for the people controller http://localhost:4000/people.  This has a button that issues a request to create a Person, and the user presses it.  The browser sends the request to the server, which runs main.marshall to field it.  This creates a people controller and an empty person form and calls the controller's New method, passing the form.  New executes the Create template, passing the empty form as data.  The user sees a web form with empty fields and a submit button.
 
 The user fills in the surname but misses out the forename, then presses the submit button.  Both surname and forename are mandatory fields, so this request should be rejected.  The form sends a Create request which is fielded by main.marshal.  It reads the form data, sets up a new person form containing the supplied surname, creates a new people controller and calls its Create method.  This runs the form's Validate method, which rejects the forename field.  The server adds a message to the form in the field errors list for the forename field, then executes the Create template, passing it the form.  The user sees a create page again, but this time the surname field contains the text that they supplied and there is an error message next to the forename field.
 
-The user fills in the forename and submits the form again.  This time validation is successful.  The people server's create method creates a new person in the database.  Now we want the user to see the people resource's index page listing the records in the people table, along with a notification at the top saying that a new Person record was created.  The Index page is driven by a ListForm, not a PersonForm.  The server gets a list of person records from the database, creates a ListForm containing that list, adds a notification and executes the Index template to display the desired page.
-
 Whenever a user submits a request, the server may hit a problem which is not to do with a particular field, for example, it cannot connect to the database.  In that case, it creates a form with the ErrorMessage field set and passes that to a template.  The user sees a page with the error message at the top.
+
+The user fills in the forename and submits the form again.  This time validation is successful.  The people server's create method creates a new person in the database.  Now we want the user to see a page with a notification at the top saying that a new Person record was created.  We show them the people resource's index page which also lists all the people records.  The Index page is driven by a ListForm, not a PersonForm.  The server gets a list of person records from the database, creates a ListForm containing that list, adds the notification and executes the Index template to display the index page page including the notification.  Notifications are displayed in green.  (Errors are displayed in red.)
+
+The index page contains buttons and links that allow the user to send a request to either: view the details of one of the person records in the list; edit a record; delete a record; create a new record.
 
 The requests and web pages are laid out using the REST model, implemented using the go-restful library.  A RESTful web server provides a set of resources that the user can access.  Each resource has its own model and controller, plus a set of views.  A resource can be (but need not be) represented by a database table.  All requests concerning a resource follow a pattern that starts with the resource name, for example:
 
@@ -191,7 +200,7 @@ The requests and web pages are laid out using the REST model, implemented using 
     /people/42/edit     fetch the data for person 42 and display a screen to change it
 ```
 
-The server is called films because a future version will display information about films - a very simple form of IMDb.  The people table will hold data about actors, directors and so on, and there will be other tables, with web pages to manipulate them.  At present there is one resource backed by one table, so one model, one controller and one set of views.
+This server is called films because a future version will display information about films - a very simple form of IMDb.  The people table will hold data about actors, directors and so on, and there will be other tables, with web pages to manipulate them.  At present there is one resource, representing one table, so the server has one model, one controller and one set of views.
 
 In Go, an object satisfies an interfaces if it implements all of the methods of the interface, so you can create an interface and then create an object that satisfies it, or you can take an existing object and write an interface that it satisfies.  Unlike with languages such as Java, this means that an interface can be retrofitted to an object that you did not create.  For example, the net/html package defines a structure called a Template which is used to render an HTML page.  The films server includes an interface Template that the HTML template structure satisfies.  The controller uses the templates in terms of that interface, so its templates can be replaced with mock versions during testing.
 
@@ -205,14 +214,18 @@ func MakePerson() Person {
 }
 ```
 
-This is a function, not a method, so it can be called like so:
+This is a function, not a class method, so it's called like so:
 ```go
 var person Person = ConcretePerson.MakePerson()
 ``` 
 
-ConcretePerson is a class (a structure), not an instance of a class.  The interface can only define class methods,  so this function can only be called using the name of the real structure. That's important, because we don't have a class member yet - we are calling the factory function to create one.  MakePerson creates an empty ConcretePerson but returns it as a Person.  (In Java, the equivalent of MakePerson is called a static factory method.)
+ConcretePerson is a structure, not an instance of a structure, so MakePerson is a function, not a method.  It can only be called via the name of the structure as above. It's important that it's not a method, because you can only call a method on an instance of a structure and we don't have one of those yet - we're calling the factory function to create one.  (In Java, the equivalent of MakePerson is called a static factory method.)
 
-Now you have a Person object, an instance of the Person class.  You can use its methods to set some values:
+MakePerson creates an empty ConcretePerson but returns it as a Person.
+
+A Go interface can only define class methods, so you can't wrote an interface that represents the MakePerson function.
+
+Having called the factory function, we have an object called person which is defined by the Person interface (not by the ConcretePerson structure).  Its class methods include some setters, so we can put data into the object:
 
 ```go
 person.SetSurname("Simon")
@@ -221,9 +234,11 @@ person.SetForeName("Ritchie")
 
 If you pass this object to a method, the method only knows that it satisfies the Person interface.  So one piece of software (usually main.marshall) can create an object using a factory function and pass it to a controller method to do the work.  The general rule is that the stuff that does the work doesn't know or care what the object is that it's working on, or how it was created.  It just knows which interface it satisfies.  This makes it easy to test the controller methods thoroughly.
 
-(At present, some controller methods also call the factory functions, but they only do that so that they can call another controller method and pass the object to it as an interface - if something uses a factory function to create an object, it promptly passes it to something else to do work on it.  The errorHandler does this.  This is unfortunate, because it means that the controller has to be polluted with knowledge of the real objects that are being used.  It would be better if it could be written to only use stuff that's passed into it. 
+(At present, some controller methods also call the factory functions, but they only do that so that they can call another controller method and pass the object to it as an interface - if something uses a factory function to create an object, it promptly passes it to something else to do work on it.  The people controller's errorHandler function does this.  This is unfortunate, because it means that the controller has to be polluted with knowledge of the real objects that are being used.  It would be better if it could be written to only use stuff that's passed into it.
 
-With the same ideas in mind, I've implemented a services layer, which provides functionality that all controllers need.  When main.marshall creates an instance of a controller, it binds the services class into it.  It supplies the HTML templates and the repository classes that give access to the database tables.  Again these are defined in terms of interfaces, so during testing, a dummy version of the services can be substituted. 
+All of the basic objects in this project (Person, PersonForm, ListForm and so on) are defined by interfaces and for each interface there is a concrete structure that satisfies the interface and provides factory functions to create an object of that type, returning it as an interface. 
+
+I've also created a services object, which provides functionality that all controllers need.  When main.marshall creates an instance of a controller, it binds the services object into it.  The services object supplies the HTML templates and the repository classes that give access to the database tables.  Again these are defined in terms of interfaces, so during testing, a dummy version of the services can be substituted. 
 
 (An obvious solution to my pollution issue is to use the services layer to provide the factory methods, but that's harder than it looks.  My first attempt led to circular dependencies, where class A includes class B and class includes class A.  That's not allowed in Go.)
 
@@ -275,7 +290,7 @@ Neither gomock nor pegomock are awfully well-documented.  In particular, the doc
 
 Your test should call some method, passing it objects that drive it through a particular path of logic.  First your test should set expectations, which means that it should configure the mock to return the right values in the right sequence to drive the method under test.    
 
-For example, the people controller package (github.com/goblimey/films/controllers/people) contains a test program that runs a series of unit tests using mock version of the HTML template, including TestUnitIndexWithOnePersonPE.  At the start of that test, I create a mock template and services object that will supply it the controller:
+For example, the people controller package (github.com/goblimey/films/controllers/people) contains a test program that runs a series of unit tests using mock version of the HTML template, including TestUnitIndexWithOnePersonPE.  At the start of that test, I create a mock template and a services object that will supply it the controller:
 
 ```go
     mockTemplate := pemocks.NewMockTemplate()
@@ -293,7 +308,7 @@ Next, I set the mock's expectations:
 
 That means "When the mock's Execute method is called with those arguments, return the value nil".  In this case, the arguments are objects that the test has set up and configured.
  
-The method under test in this case is the people controller's index method.  Next I crete a controller, pass in my dummy services object, and call the method:
+The method under test in this case is the people controller's index method.  Next I create a controller, pass in my dummy services object, and call the method:
 
 ```go
     // Run the test.
