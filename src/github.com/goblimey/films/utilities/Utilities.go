@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/goblimey/films/retrofit/restful/response"
+	restful "github.com/emicklei/go-restful"
 )
 
 // Dead displays a hand-crafted error page.  It's the page of last resort.
-func Dead(resp response.Response) {
+func Dead(response *restful.Response) {
 	log.SetPrefix("Dead() ")
 	log.Println()
 	defer noPanic()
@@ -23,10 +23,10 @@ func Dead(resp response.Response) {
 		"<p>We will be restoring normality just as soon as we are sure what is normal anyway.</p>",
 		"</body></html>")
 
-	_, err := fmt.Fprintln(resp.Response().ResponseWriter, html)
+	_, err := fmt.Fprintln(response.ResponseWriter, html)
 	if err != nil {
 		log.Printf("error while attempting to display the error page of last resort - %s", err.Error())
-		http.Error(resp.Response().ResponseWriter, err.Error(), http.StatusInternalServerError)
+		http.Error(response.ResponseWriter, err.Error(), http.StatusInternalServerError)
 	}
 }
 

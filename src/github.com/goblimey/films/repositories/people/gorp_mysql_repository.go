@@ -3,7 +3,7 @@
 // supplied by the parent.  For example it could be a MySQL table accessed via GORP,
 // but it could also be a mock session.
 //
-// The GorpMysqlDAO satisfies the DAO interface.
+// The GorpMysqlRepo satisfies the DAO interface.
 package people
 
 import (
@@ -18,26 +18,26 @@ import (
 	"github.com/goblimey/films/utilities/dbsession"
 )
 
-// GorpMysqlDAO satifies the DAO interface.
-type GorpMysqlDAO struct {
+// GorpMysqlRepo satifies the Repository interface.
+type GorpMysqlRepo struct {
 	session dbsession.DBSession
 }
 
-// MakeDAO is a factory function that creates a GorpMysqlDAO and returns it as a DAO.
-func MakeDAO(session dbsession.DBSession) DAO {
-	var DAO DAO = &GorpMysqlDAO{session}
-	return DAO
+// MakeDAO is a factory function that creates a GorpMysqlRepo and returns it as a
+// Repository.
+func MakeRepo(session dbsession.DBSession) Repository {
+	return &GorpMysqlRepo{session}
 }
 
 // SetSession sets the session.
-func (gmpd *GorpMysqlDAO) SetSession(session dbsession.DBSession) {
+func (gmpd *GorpMysqlRepo) SetSession(session dbsession.DBSession) {
 	gmpd.session = session
 }
 
 // FindAll returns a list of all valid Person records from the database in a slice.
 // The result may be an empty slice.  If the database lookup fails, the error is
 // returned instead.
-func (gmpd GorpMysqlDAO) FindAll() ([]personModel.Person, error) {
+func (gmpd GorpMysqlRepo) FindAll() ([]personModel.Person, error) {
 	m := "FindAll()"
 	log.Printf("%s:\n", m)
 	people, err := gmpd.session.FindAllPeople()
@@ -47,7 +47,7 @@ func (gmpd GorpMysqlDAO) FindAll() ([]personModel.Person, error) {
 // FindByID fetches the row from the people table with the given uint64 id. It
 // validates that data and, if it's valid, returns the person.  If the data is not
 // valid the function returns an error message.
-func (gmpd GorpMysqlDAO) FindByID(id uint64) (personModel.Person, error) {
+func (gmpd GorpMysqlRepo) FindByID(id uint64) (personModel.Person, error) {
 	m := "FindByID()"
 	log.Printf("%s: ID %d", m, id)
 
@@ -70,7 +70,7 @@ func (gmpd GorpMysqlDAO) FindByID(id uint64) (personModel.Person, error) {
 // the function returns an errormessage.  The ID in the database is numeric and the method
 // checks that the given ID is also numeric before it makes the call.  This avoids hitting
 // the DB when the id is obviously junk.
-func (gmpd GorpMysqlDAO) FindByIDStr(idStr string) (personModel.Person, error) {
+func (gmpd GorpMysqlRepo) FindByIDStr(idStr string) (personModel.Person, error) {
 	m := "FindByIDStr()"
 	id, err := strconv.ParseUint(idStr, 10, 64)
 	if err != nil {
@@ -85,7 +85,7 @@ func (gmpd GorpMysqlDAO) FindByIDStr(idStr string) (personModel.Person, error) {
 // data with an auto-incremented ID and returns any error that the DB call returns.
 // On a successful create, the method returns the created person, including
 // the assigned ID.  This is all done within a transaction to ensure atomicity.
-func (gmpd GorpMysqlDAO) Create(person personModel.Person) (personModel.Person, error) {
+func (gmpd GorpMysqlRepo) Create(person personModel.Person) (personModel.Person, error) {
 	m := "Create()"
 	log.Printf("%s:", m)
 	tx, err := gmpd.session.StartTransaction()
@@ -113,7 +113,7 @@ func (gmpd GorpMysqlDAO) Create(person personModel.Person) (personModel.Person, 
 // Update takes a person record, updates the record in the people table with the same ID
 // and returns the updated person or any error that the DB call supplies to it.  The update
 // is done within a transaction
-func (gmpd GorpMysqlDAO) Update(person personModel.Person) (uint64, error) {
+func (gmpd GorpMysqlRepo) Update(person personModel.Person) (uint64, error) {
 	m := "Update()"
 	tx, err := gmpd.session.StartTransaction()
 	if err != nil {
@@ -147,7 +147,7 @@ func (gmpd GorpMysqlDAO) Update(person personModel.Person) (uint64, error) {
 // DeleteByID takes the given uint64 ID and deletes the record with that ID from the people table.
 // The function returns the row count and error that the database supplies to it.  On a successful
 // delete, it should return 1, having deleted one row.
-func (gmpd GorpMysqlDAO) DeleteByID(id uint64) (int64, error) {
+func (gmpd GorpMysqlRepo) DeleteByID(id uint64) (int64, error) {
 	m := "DeleteByID()"
 	log.Printf("%s: ID %d", m, id)
 	// Need a Person record for the delete method, so fake one up.
@@ -188,7 +188,7 @@ func (gmpd GorpMysqlDAO) DeleteByID(id uint64) (int64, error) {
 // it makes the call.  If not, it returns an error.  If the ID looks sensible, the function attempts
 // the delete and returns the row count and error that the database supplies to it.  On a successful
 // delete, it should return 1, having deleted one row.
-func (gmpd GorpMysqlDAO) DeleteByIDStr(idStr string) (int64, error) {
+func (gmpd GorpMysqlRepo) DeleteByIDStr(idStr string) (int64, error) {
 	m := "DeleteByIDStr()"
 	log.Printf("%s: ID %s", m, idStr)
 	// Check the id.

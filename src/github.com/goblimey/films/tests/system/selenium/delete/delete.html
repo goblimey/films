@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost:4000/" />
+<title>delete</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">delete</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/people</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=CreateLink</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=forename</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=surname</td>
+	<td>delete</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=CreateButton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=h2</td>
+	<td>Films</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>css=h3</td>
+	<td>People</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>//p[2]/font/b</td>
+	<td>created new person {*, test, delete}</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=LinkToShowtestdelete</td>
+	<td>test delete</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=LinkToEdittestdelete</td>
+	<td>Edit</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=DeleteButtontestdelete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=CreateLink</td>
+	<td>Create Person</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=CreateLink</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=forename</td>
+	<td>delete</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>id=surname</td>
+	<td>test</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=CreateButton</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=LinkToShowtestdelete</td>
+	<td>test delete</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=DeleteButtondeletetest</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=LinkToShowtestdelete</td>
+	<td>test delete</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=LinkToEdittestdelete</td>
+	<td>Edit</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=DeleteButtontestdelete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=LinkToShowtestdelete</td>
+	<td>test delete</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=LinkToEdittestdelete</td>
+	<td>Edit</td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=DeleteButtontestdelete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertText</td>
+	<td>id=CreateLink</td>
+	<td>Create Person</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>id=DeleteButtontestdelete</td>
+	<td></td>
+</tr>
+</tbody></table>
+</body>
+</html>

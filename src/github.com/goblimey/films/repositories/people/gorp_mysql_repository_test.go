@@ -10,7 +10,7 @@ import (
 	dbsession "github.com/goblimey/films/utilities/dbsession"
 )
 
-// This is an integration test for the GorpMysqlDAO connecting to a MySQL DB via GORP.
+// This is an integration test for the GorpMysqlRepo connecting to a MySQL DB via GORP.
 
 var expectedForename1 = "foo"
 var expectedSurname1 = "bar"
@@ -27,7 +27,7 @@ func TestIntCreatePersonStoreFetchBackAndCheckContents(t *testing.T) {
 	}
 	defer dbsession.Close()
 
-	dao := MakeDAO(dbsession)
+	dao := MakeRepo(dbsession)
 
 	clearDown(dao, t)
 
@@ -82,7 +82,7 @@ func TestIntCreateTwoPersonsAndReadBack(t *testing.T) {
 	}
 	defer dbsession.Close()
 
-	dao := MakeDAO(dbsession)
+	dao := MakeRepo(dbsession)
 
 	clearDown(dao, t)
 
@@ -179,7 +179,7 @@ func TestIntCreateTwoPeopleAndDeleteOneByIDStr(t *testing.T) {
 	}
 	defer dbsession.Close()
 
-	dao := MakeDAO(dbsession)
+	dao := MakeRepo(dbsession)
 
 	clearDown(dao, t)
 
@@ -243,7 +243,7 @@ func TestIntCreatePersonAndUpdate(t *testing.T) {
 	}
 	defer dbsession.Close()
 
-	dao := MakeDAO(dbsession)
+	dao := MakeRepo(dbsession)
 
 	clearDown(dao, t)
 
@@ -284,14 +284,14 @@ func TestIntCreatePersonAndUpdate(t *testing.T) {
 }
 
 // clearDown() - helper function to remove all people from the DB
-func clearDown(dao DAO, t *testing.T) {
-	people, err := dao.FindAll()
+func clearDown(repo Repository, t *testing.T) {
+	people, err := repo.FindAll()
 	if err != nil {
 		t.Errorf(err.Error())
 		return
 	}
 	for _, person := range people {
-		rows, err := dao.DeleteByID(person.ID())
+		rows, err := repo.DeleteByID(person.ID())
 		if err != nil {
 			t.Errorf(err.Error())
 			continue
