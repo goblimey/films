@@ -192,6 +192,8 @@ The user fills in the forename and submits the form again.  This time validation
 
 The index page contains buttons and links that allow the user to send a request to either: view the details of one of the person records in the list; edit a record; delete a record; create a new record.
 
+Each request has its own database connection and its own instance of the controller.  Both are created at the start of the request and torn down at the end.
+
 The requests and web pages are laid out using the REST model, implemented using the go-restful library.  A RESTful web server provides a set of resources that the user can access.  Each resource has its own model and controller, plus a set of views.  A resource can be (but need not be) represented by a database table.  All requests concerning a resource follow a pattern that starts with the resource name, for example:
 
 ```
