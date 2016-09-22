@@ -100,9 +100,9 @@ Start the server from a command window.  If you have logged out and back in agai
     .  setenv.sh
 ```
 
-The "go install" that you ran earlier created a program called "films" in the bin directory at the top level of the project.  The commands in setenv.sh put the program into your path, so you can run it.
+(For Windows, see above.)
 
-For Windows see above.
+The "go install" that you ran earlier created a program called "films" in the bin directory at the top level of the project.  The commands in setenv.sh put the program into your path, so you can run it.
 
 Move to the directory containing the views directory:
 
@@ -180,7 +180,7 @@ In the films server, all requests are sent to a function in the main package cal
 
 A quick explanation for anybody who hasn't written a back-end web server before:  A web server loops forever, waiting for a request and then calling a controller method to handle it.  The controller method sends a response back to the browser which is an HTML page.  For the user's session to continue, every response page should contain buttons or links that allow them to issue another request.  The user's session is a series of requests and responses which lasts until the user gets bored and goes away.  The server runs until it's forcibly shut down.
 
-So the user and the server run through a session composed of a series of requests and responses.  Every response displays an HTML page and every page has links or buttons to issue another request and continue the session.  The pages allow the user to create, read, update and delete data in the table.  They have no direct access to the database or its tables, so they can only do with this table what the controller allows them to do and they can't access any other tables, if any exist.
+So the user and the server run through a session composed of a series of requests and responses.  Every response displays an HTML page and every page has links or buttons to issue another request and continue the session.  In the films server, the pages allow the user to create, read, update and delete data in the table.  They have no direct access to the database or its tables, so they can only do with this table what the controller allows them to do and they can't access any other tables, if any exist.
 
 The workings of the server are best illustrated with an example.  A user starts at the index page for the people controller http://localhost:4000/people.  This has a button that issues a request to create a Person, and the user presses it.  The browser sends the request to the server, which runs main.marshall to field it.  This creates a people controller and an empty person form and calls the controller's New method, passing the form.  New executes the Create template, passing the empty form as data.  The user sees a web form with empty fields and a submit button.
 
@@ -188,19 +188,27 @@ The user fills in the surname but misses out the forename, then presses the subm
 
 Whenever a user submits a request, the server may hit a problem which is not to do with a particular field, for example, it cannot connect to the database.  In that case, it creates a form with the ErrorMessage field set and passes that to a template.  The user sees a page with the error message at the top.
 
-The user fills in the forename and submits the form again.  This time validation is successful.  The people server's create method creates a new person in the database.  Now we want the user to see a page with a notification at the top saying that a new Person record was created.  We show them the people resource's index page which also lists all the people records.  The Index page is driven by a ListForm, not a PersonForm.  The server gets a list of person records from the database, creates a ListForm containing that list, adds the notification and executes the Index template to display the index page page including the notification.  Notifications are displayed in green.  (Errors are displayed in red.)
+The user fills in the forename and submits the form again.  This time validation is successful.  The people server's create method creates a new person in the database.  Now we want the user to see a page with a notification at the top saying that a new Person record was created.  At present the server uses the people resource's index page, so they see the notification and below it a list of all the people records.  The Index page is driven by a ListForm, not a PersonForm.  The server gets a list of person records from the database, creates a ListForm containing that list, adds the notification and executes the Index template to display the page.
+
+Notifications are displayed in green, errors are displayed in red, but all that is determined by the view, of course. 
 
 The index page contains buttons and links that allow the user to send a request to either: view the details of one of the person records in the list; edit a record; delete a record; create a new record.
 
 Each request has its own database connection and its own instance of the controller.  Both are created at the start of the request and torn down at the end.
 
-The requests and web pages are laid out using the REST model, implemented using the go-restful library.  A RESTful web server provides a set of resources that the user can access.  Each resource has its own model and controller, plus a set of views.  A resource can be (but need not be) represented by a database table.  All requests concerning a resource follow a pattern that starts with the resource name, for example:
+The requests and web pages are laid out using the REST model, implemented using the go-restful library.  A RESTful web server provides a set of resources that the user can access.  Each resource has its own model and controller, plus a set of views.  A resource can be (but need not be) represented by a database table.  The URI of the requests concerning a resource all follow a pattern that starts with the resource name, for example:
 
 ```
     /people             display all people
     /people/42          display the person with ID 42
     /people/42/edit     fetch the data for person 42 and display a screen to change it
 ```
+
+Except for form data, parameters are not used in RESTful requests, so URIs such as "/editperson&id=42" are not used.
+
+As well as the URI, an HTTP request contains a method, GET, POST, PUT, DELETE etc.  The REST model mandates that the GET method must only be used in requests that don't change the data.  Methods such as POST, PUT and DELETE are used for requests that make changes.
+
+There is a complication, which is that none of the common browsers will issue a PUT or DELETE request from a web form, only GET and POST.  To get round this, I use the popular solution of issuing a POST with an "_method"  parameter giving the intended request method.  (It's also possible to use Javascript to intercept the request and replace the method, but I don't do that here.)
 
 This server is called films because a future version will display information about films - a very simple form of IMDb.  The people table will hold data about actors, directors and so on, and there will be other tables, with web pages to manipulate them.  At present there is one resource, representing one table, so the server has one model, one controller and one set of views.
 
@@ -242,20 +250,20 @@ All of the basic objects in this project (Person, PersonForm, ListForm and so on
 
 I've also created a services object, which provides functionality that all controllers need.  When main.marshall creates an instance of a controller, it binds the services object into it.  The services object supplies the HTML templates and the repository classes that give access to the database tables.  Again these are defined in terms of interfaces, so during testing, a dummy version of the services can be substituted. 
 
-(An obvious solution to my pollution issue is to use the services layer to provide the factory methods, but that's harder than it looks.  My first attempt led to circular dependencies, where class A includes class B and class includes class A.  That's not allowed in Go.)
+(An obvious solution to my pollution issue is to use the services layer to provide the factory methods, but that's slightly harder than it looks.  My first attempt led to circular dependencies, where class A includes class B and class includes class A.  That's not allowed in Go.)
 
 
 The Database
 ============
 
-The database runs under MySQL.  The server uses the GORP library to connect to the database.  That, of course, is the concern only of the model, and another model can be slotted in to replace it.  In the unit tests, the MySQL model is replaced by objects that provide fixed datasets that drive the logic through the desired logic paths.
+The database runs under MySQL.  The server uses the GORP library to connect to the database.  That, of course, is the concern only of the model, and another model can be slotted in to replace it.  In the unit tests, the MySQL model is replaced by objects that provide fixed datasets that drive the logic through the desired paths.
 
 Testing
 =======
 
-The films server includes unit tests, each of which tests a single unit of software in isolation by providing it with dummy objects containing data specifically written for the test.  There are also integration tests, where a few units of software are bound together and tests are run to check that everything hangs together.  My integration tests check that the controller and the MySQL model work together correctly.  Finally, system tests check that the whole system works together.  Go includes a facility for running tests on a complete web server, but I use Selenium, specifically the Firefox Selenium addon, which can be used to test any web server, regardless of the technology used to create it.
+The films server includes unit tests, each of which tests a single unit of software in isolation by providing it with dummy objects containing data specifically written for the test.  There are also integration tests, where a few units of software are bound together and tests are run to check that everything hangs together.  My integration tests check that the controller and the MySQL model work together correctly.  Finally, system tests check that the whole system works.  Go includes a facility for running tests on a complete web server, but I use Selenium, specifically the Firefox Selenium addon, which can be used to test any web server, regardless of the technology used to create it.
 
-The test directory contains a number of Selenium scripts for system testing.  To run them in Firefox, install the Selenium addon, start it up and use the file menu to load one of the test suites.  They are in the tests directory.  (Don't forget to start the films server!)  Use the green arrow buttons to run the whole suite or one of the tests in it.  As the test runs, you can see the results in your browser.  There's also a control to speed up and slow down the replay, so you can watch what's going on.  The tests assume that the database is empty at the start.
+The project includes a number of Selenium scripts for system testing.  To run them in Firefox, install the Selenium addon, start it up and use the file menu to load one of the test suites.  They are in the tests directory.  (Don't forget to start the films server first!)  Use the green arrow buttons to run the whole suite or one of the tests in it.  As the test runs, you can see the results in your browser.  There's also a control to speed up and slow down the replay, so you can follw what's going on.  Each test puts some data in the database and then removes it.  They all assume that the database is empty at the start.
 
 The unit and integration tests are written using the standard Go test facilities, plus gomock and pegomock for mocking.  These tests live in the same directory as the module that they are testing, so it's easy to see how it's been tested.
 
@@ -336,13 +344,13 @@ This gets the template for the Index page from the services object, checks that 
 
 In our test, the services object is a dummy that supplies the mock template, so the controller calls the mock's Execute method.  We configured the mock to return nil, so the controller heads down the logic path that it would follow in the real world if it called a real HTML template's Execute method and got nil as the return value.
 
-(If you wanted to test what the controller would do if it got back an error, then when you set up the expectations, you would create an error object and tell the mock to return that instead of nil.  The test program has other tests that do that.)
+(If you wanted to test what the controller would do if it got back an error, then when you set up the expectations, you would create an error object and tell the mock to return that instead of nil.  My controller test program has other tests that do that.)
  
 At the end of the test, the mock is torn down and as part of that sequence it automatically checks that everything went according to plan.  In particular it checks that its method were called in the sequence that you defined in the expectations, and raises errors if they weren't.
 
 You can also add your own checks to the test, for example after you have called the controller method, the test can examine the contents of the form that you passed.
 
-I don't include the mocks in my git repository.  This is deliberate, as they are generated by my test script test.sh, and that is in the repository.  (If you are running under Windows, the script won't work and you will have to generate the mocks yourself, but you can use it as a guide.)
+I use mocks that I've written muyself and mocks generated by the mocking frameworks.  I don't include the generated mocks in my git repository.  This is deliberate, as they are created when you run the test script test.sh, and that script is in the repository.  (If you are running under Windows, the script won't work and you will have to generate the mocks yourself, but you can use it as a guide.)
 
 There are other mocking frameworks available.  The pegomock github page includes a survey of them. 
 
