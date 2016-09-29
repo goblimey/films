@@ -57,7 +57,7 @@ SET PATH=%PATH%;c:\Users\simon\goprojects\films\bin
 Setting Up the Database
 -----------------------
 
-The server expects a MySQL database, so you need to install the MySQL client and server, which you can get from the Oracle website www.oracle.com.  You will need to create an account to download MySQL, but it is free.
+The server expects a MySQL database, so you need to install the MySQL client and server, which you can get from https://www.mysql.com/.
 
 Once you have MySQL running, create a database called "films". This must be accessible with all privileges by a user called "webuser" with password "secret".  You can set that up as follows using the mysql client:
 
