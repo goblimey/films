@@ -15,7 +15,7 @@ First, get the dependencies:
 
 ```
 go get github.com/go-sql-driver/mysql
-go get github.com/coopernurse/gorp
+go get gopkg.in/gorp.v1
 go get github.com/emicklei/go-restful
 go get github.com/golang/mock/gomock
 go get github.com/petergtz/pegomock/pegomock
